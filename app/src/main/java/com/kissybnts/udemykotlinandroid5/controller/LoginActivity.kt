@@ -1,9 +1,10 @@
-package com.kissybnts.udemykotlinandroid5
+package com.kissybnts.udemykotlinandroid5.controller
 
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.kissybnts.udemykotlinandroid5.R
 
 class LoginActivity : AppCompatActivity() {
 

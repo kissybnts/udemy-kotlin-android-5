@@ -1,9 +1,10 @@
-package com.kissybnts.udemykotlinandroid5
+package com.kissybnts.udemykotlinandroid5.controller
 
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.kissybnts.udemykotlinandroid5.R
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
