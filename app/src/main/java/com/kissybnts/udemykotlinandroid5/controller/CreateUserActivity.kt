@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.kissybnts.udemykotlinandroid5.R
+import com.kissybnts.udemykotlinandroid5.service.AuthService
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
@@ -49,6 +50,8 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     fun onCreateUserButtonClicked(view: View) {
-
+        AuthService.registerUser(this, "email@email.com", "123456789") {
+            println(it)
+        }
     }
 }
