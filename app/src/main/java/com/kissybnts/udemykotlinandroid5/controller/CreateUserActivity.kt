@@ -4,8 +4,10 @@ import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.service.AuthService
+import com.kissybnts.udemykotlinandroid5.service.UserDataService
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
@@ -50,17 +52,27 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     fun onCreateUserButtonClicked(view: View) {
+        val userName = userNameTextCreateUser.text.toString()
         val email = emailTextCreateUser.text.toString()
         val password = passwordTestCreateUser.text.toString()
         AuthService.registerUser(this, email, password) { registerSuccess ->
             if (registerSuccess) {
                 AuthService.login(this, email, password) { loginSuccess ->
                     if (loginSuccess) {
-                        println(AuthService.userEmail)
-                        println(AuthService.token)
-                        println(AuthService.isAuthed)
+                        AuthService.createUser(this, userName, email, userAvatar, avatarColor) { createSuccess ->
+                            if (createSuccess) {
+                                println(UserDataService.toString())
+                                finish()
+                            } else {
+                                Toast.makeText(this, "Failed to createUser", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this, "Failed to login", Toast.LENGTH_LONG).show()
                     }
                 }
+            } else {
+                Toast.makeText(this, "Failed to registerUser", Toast.LENGTH_LONG).show()
             }
         }
     }
