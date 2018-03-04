@@ -1,15 +1,15 @@
 package com.kissybnts.udemykotlinandroid5.service
 
 import android.content.Context
+import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.kissybnts.udemykotlinandroid5.utils.URL_CREATE_USER
-import com.kissybnts.udemykotlinandroid5.utils.URL_LOGIN
-import com.kissybnts.udemykotlinandroid5.utils.URL_REGISTER
+import com.kissybnts.udemykotlinandroid5.utils.*
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -122,5 +122,43 @@ object AuthService {
         }
         
         Volley.newRequestQueue(context).add(createUserRequest)
+    }
+
+
+    fun findByUserByEmail(context: Context, complete: (Boolean) -> Unit) {
+        val url = URL_FIND_USER_BY_EMIL(userEmail)
+        val findUserRequest = object : JsonObjectRequest(Request.Method.GET, url, null, Response.Listener {
+            try {
+                it.run {
+                    UserDataService.id = getString("_id")
+                    UserDataService.name = getString("name")
+                    UserDataService.email = getString("email")
+                    UserDataService.avatarName = getString("avatarName")
+                    UserDataService.avatarColor = getString("avatarColor")
+                }
+
+                // Broadcast what user data has been changed
+                val userDataChange = Intent(BROADCAST_USER_DATA_CHANGE)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(userDataChange)
+
+                complete(true)
+            } catch (e: JSONException) {
+                Log.d("JSON", "EXC: ${e.localizedMessage}")
+                complete(false)
+            }
+        }, Response.ErrorListener {
+            Log.d("ERROR", "Could not log in: $it")
+            complete(false)
+        }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                return hashMapOf("Authorization" to "Bearer ${token}")
+            }
+
+            override fun getBodyContentType(): String {
+                return contentType
+            }
+        }
+
+         Volley.newRequestQueue(context).add(findUserRequest)
     }
 }
