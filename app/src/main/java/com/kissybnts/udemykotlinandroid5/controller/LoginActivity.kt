@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.service.AuthService
+import com.kissybnts.udemykotlinandroid5.utils.hideKeyboard
 import com.kissybnts.udemykotlinandroid5.utils.showErrorToast
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -52,14 +53,6 @@ class LoginActivity : AppCompatActivity() {
         val createUserIntent = Intent(this, CreateUserActivity::class.java)
         startActivity(createUserIntent)
         finish()
-    }
-
-    fun hideKeyboard() {
-        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-
-        if (inputManager.isAcceptingText) {
-            inputManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-        }
     }
 
     private fun errorToast(message: String) {
