@@ -11,6 +11,7 @@ import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.service.AuthService
 import com.kissybnts.udemykotlinandroid5.service.UserDataService
 import com.kissybnts.udemykotlinandroid5.utils.BROADCAST_USER_DATA_CHANGE
+import com.kissybnts.udemykotlinandroid5.utils.showErrorToast
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
@@ -94,7 +95,7 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     private fun errorToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        showErrorToast(message, Toast.LENGTH_LONG)
         enableSpinner(false)
     }
 
