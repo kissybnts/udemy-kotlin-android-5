@@ -14,19 +14,26 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.EditText
 import com.kissybnts.udemykotlinandroid5.R
+import com.kissybnts.udemykotlinandroid5.model.Channel
 import com.kissybnts.udemykotlinandroid5.service.AuthService
+import com.kissybnts.udemykotlinandroid5.service.MessageService
 import com.kissybnts.udemykotlinandroid5.service.UserDataService
-import com.kissybnts.udemykotlinandroid5.utils.BROADCAST_USER_DATA_CHANGE
-import com.kissybnts.udemykotlinandroid5.utils.EMIT_ADD_CHANNEL
-import com.kissybnts.udemykotlinandroid5.utils.URL_SOCKET
-import com.kissybnts.udemykotlinandroid5.utils.hideKeyboard
+import com.kissybnts.udemykotlinandroid5.utils.*
 import io.socket.client.IO
+import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
 class MainActivity : AppCompatActivity() {
     private val socket = IO.socket(URL_SOCKET)
+    private val onNewChannel = Emitter.Listener { args ->
+        runOnUiThread {
+            val channel = Channel(args)
+            MessageService.channels.add(channel)
+            println(channel)
+        }
+    }
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -52,22 +59,19 @@ class MainActivity : AppCompatActivity() {
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+        socket.connect()
+        socket.on(EMIT_CHANNEL_CREATED, onNewChannel)
     }
 
     override fun onResume() {
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(BROADCAST_USER_DATA_CHANGE))
-        socket.connect()
         super.onResume()
     }
 
-    override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
-        super.onPause()
-    }
-
     override fun onDestroy() {
-        super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
         socket.disconnect()
+        super.onDestroy()
     }
 
 

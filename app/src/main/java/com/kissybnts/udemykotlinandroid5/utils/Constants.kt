@@ -11,3 +11,4 @@ const val URL_SOCKET = "https://udemykotlinandroid.herokuapp.com"
 const val BROADCAST_USER_DATA_CHANGE = "broadcast/userDataChange"
 
 const val EMIT_ADD_CHANNEL = "newChannel"
+const val EMIT_CHANNEL_CREATED = "channelCreated"
