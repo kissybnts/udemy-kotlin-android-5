@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.model.Channel
@@ -31,21 +32,26 @@ class MainActivity : AppCompatActivity() {
         runOnUiThread {
             val channel = Channel(args)
             MessageService.channels.add(channel)
-            println(channel)
+            channelAdapter.notifyDataSetChanged()
         }
     }
+    private lateinit var channelAdapter: ArrayAdapter<Channel>
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context, intent: Intent?) {
             if (AuthService.isAuthed) {
-                println(UserDataService.toString())
                 userNameNavHeader.text = UserDataService.name
                 userEmailNavHeader.text = UserDataService.email
                 val resourceId = resources.getIdentifier(UserDataService.avatarName, "drawable", packageName)
                 userImageNavHeader.setImageResource(resourceId)
                 userImageNavHeader.setBackgroundColor(UserDataService.getAvatarColor(UserDataService.avatarColor))
                 loginButtonNavHeader.text = "Logout"
-                println("done")
+
+                MessageService.getChannels(context) { complete ->
+                    if (complete) {
+                        channelAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         }
     }
@@ -59,6 +65,8 @@ class MainActivity : AppCompatActivity() {
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+        setupAdapters()
+
         socket.connect()
         socket.on(EMIT_CHANNEL_CREATED, onNewChannel)
     }
@@ -74,13 +82,17 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun setupAdapters() {
+        channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
+        channel_list.adapter = channelAdapter
     }
 
     fun onLoginButtonClicked(view: View) {

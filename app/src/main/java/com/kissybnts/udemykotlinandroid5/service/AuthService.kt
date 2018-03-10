@@ -18,8 +18,6 @@ object AuthService {
     var isAuthed = false
     var userEmail = ""
 
-    private const val contentType = "application/json; charset=utf-8"
-
     fun registerUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
         val url: String = URL_REGISTER
 
@@ -35,7 +33,7 @@ object AuthService {
             complete(false)
         }) {
             override fun getBodyContentType(): String {
-                return contentType
+                return CONTENT_TYPE
             }
 
             override fun getBody(): ByteArray {
@@ -69,7 +67,7 @@ object AuthService {
             complete(false)
         }) {
             override fun getBodyContentType(): String {
-                return contentType
+                return CONTENT_TYPE
             }
 
             override fun getBody(): ByteArray {
@@ -109,7 +107,7 @@ object AuthService {
             complete(false)
         }) {
             override fun getBodyContentType(): String {
-                return contentType
+                return CONTENT_TYPE
             }
 
             override fun getBody(): ByteArray {
@@ -155,7 +153,7 @@ object AuthService {
             }
 
             override fun getBodyContentType(): String {
-                return contentType
+                return CONTENT_TYPE
             }
         }
 
