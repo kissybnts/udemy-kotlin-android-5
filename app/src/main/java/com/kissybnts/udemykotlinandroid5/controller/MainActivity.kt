@@ -24,6 +24,7 @@ import io.socket.client.IO
 import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private lateinit var channelAdapter: ArrayAdapter<Channel>
+    private var selectedChannel: Channel? = null
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -47,9 +49,11 @@ class MainActivity : AppCompatActivity() {
                 userImageNavHeader.setBackgroundColor(UserDataService.getAvatarColor(UserDataService.avatarColor))
                 loginButtonNavHeader.text = "Logout"
 
-                MessageService.getChannels(context) { complete ->
+                MessageService.getChannels { complete ->
                     if (complete) {
+                        selectedChannel = MessageService.channels.firstOrNull()
                         channelAdapter.notifyDataSetChanged()
+                        updateWithChannel()
                     }
                 }
             }
@@ -72,6 +76,12 @@ class MainActivity : AppCompatActivity() {
 
         if (App.prefs.isLoggedIn) {
             AuthService.findByUserByEmail(this) {}
+        }
+
+        channel_list.setOnItemClickListener { _, _, i, _ ->
+            selectedChannel = MessageService.channels[i]
+            drawer_layout.closeDrawer(GravityCompat.START)
+            updateWithChannel()
         }
     }
 
@@ -117,13 +127,13 @@ class MainActivity : AppCompatActivity() {
         if (App.prefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
-            builder.setView(dialogView).setPositiveButton("Add") { dialogInterface, i ->
+            builder.setView(dialogView).setPositiveButton("Add") { _, _ ->
                 // perform some logic to add channel
                 val channelName = dialogView.findViewById<EditText>(R.id.channelNameTextAddChannel).text.toString()
                 val channelDescription = dialogView.findViewById<EditText>(R.id.channelDescriptionTextAddChannel).text.toString()
 
                 socket.emit(EMIT_ADD_CHANNEL, channelName, channelDescription)
-            }.setNegativeButton("Cancel") { dialogInterface, i ->
+            }.setNegativeButton("Cancel") { _, i ->
                 // TODO do something when adding channel canceled
             }.show()
         }
@@ -131,5 +141,9 @@ class MainActivity : AppCompatActivity() {
 
     fun onSendMessageButtonClicked(view: View) {
         hideKeyboard()
+    }
+
+    fun updateWithChannel() {
+        mainChannelName.text = selectedChannel?.toString()
     }
 }

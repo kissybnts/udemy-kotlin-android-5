@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.Toast
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.service.AuthService
-import com.kissybnts.udemykotlinandroid5.service.UserDataService
 import com.kissybnts.udemykotlinandroid5.utils.BROADCAST_USER_DATA_CHANGE
 import com.kissybnts.udemykotlinandroid5.utils.showErrorToast
 import kotlinx.android.synthetic.main.activity_create_user.*
@@ -68,11 +67,11 @@ class CreateUserActivity : AppCompatActivity() {
             return
         }
 
-        AuthService.registerUser(this, email, password) { registerSuccess ->
+        AuthService.registerUser(email, password) { registerSuccess ->
             if (registerSuccess) {
-                AuthService.login(this, email, password) { loginSuccess ->
+                AuthService.login(email, password) { loginSuccess ->
                     if (loginSuccess) {
-                        AuthService.createUser(this, userName, email, userAvatar, avatarColor) { createSuccess ->
+                        AuthService.createUser(userName, email, userAvatar, avatarColor) { createSuccess ->
                             if (createSuccess) {
                                 // Notify that the user data has been changed to another activity using LocalBroadcast
                                 val userDataChange = Intent(BROADCAST_USER_DATA_CHANGE)

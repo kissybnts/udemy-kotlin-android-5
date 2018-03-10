@@ -14,7 +14,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 object AuthService {
-    fun registerUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
+    fun registerUser(email: String, password: String, complete: (Boolean) -> Unit) {
         val url: String = URL_REGISTER
 
         val requestBody = JSONObject().apply {
@@ -40,7 +40,7 @@ object AuthService {
         App.prefs.requestQue.add(registerRequest)
     }
 
-    fun login(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
+    fun login(email: String, password: String, complete: (Boolean) -> Unit) {
         val url = URL_LOGIN
 
         val requestBody = JSONObject().apply {
@@ -74,7 +74,7 @@ object AuthService {
         App.prefs.requestQue.add(loginRequest)
     }
     
-    fun createUser(context: Context, name: String, email: String, avatarName: String, avatarColor: String, complete: (Boolean) -> Unit) {
+    fun createUser(name: String, email: String, avatarName: String, avatarColor: String, complete: (Boolean) -> Unit) {
         val url = URL_CREATE_USER
 
         val requestBody = JSONObject().apply {

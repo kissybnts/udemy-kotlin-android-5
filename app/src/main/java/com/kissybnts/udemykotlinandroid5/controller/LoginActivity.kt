@@ -1,11 +1,9 @@
 package com.kissybnts.udemykotlinandroid5.controller
 
-import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.service.AuthService
@@ -33,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
         hideKeyboard()
 
-        AuthService.login(this, email, password) { loginSuccess ->
+        AuthService.login(email, password) { loginSuccess ->
             if (loginSuccess) {
                 AuthService.findByUserByEmail(this) { userFound ->
                     if (userFound) {
