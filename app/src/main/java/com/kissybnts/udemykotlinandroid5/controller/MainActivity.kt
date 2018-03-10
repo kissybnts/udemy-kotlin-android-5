@@ -11,10 +11,12 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.kissybnts.udemykotlinandroid5.R
+import com.kissybnts.udemykotlinandroid5.adapter.MessageAdapter
 import com.kissybnts.udemykotlinandroid5.model.Channel
 import com.kissybnts.udemykotlinandroid5.model.Message
 import com.kissybnts.udemykotlinandroid5.service.AuthService
@@ -46,12 +48,14 @@ class MainActivity : AppCompatActivity() {
                 if (selectedChannel?.id == args[2] as String) {
                     val message = Message(args)
                     MessageService.messages.add(message)
-                    println(message)
+                    messageAdapter.notifyDataSetChanged()
+                    messageListView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                 }
             }
         }
     }
     private lateinit var channelAdapter: ArrayAdapter<Channel>
+    private lateinit var messageAdapter: MessageAdapter
     private var selectedChannel: Channel? = null
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
@@ -125,6 +129,12 @@ class MainActivity : AppCompatActivity() {
     private fun setupAdapters() {
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
         channel_list.adapter = channelAdapter
+
+        messageAdapter = MessageAdapter(this, MessageService.messages)
+        val layoutManager = LinearLayoutManager(this)
+        messageListView.adapter = messageAdapter
+        messageListView.layoutManager = layoutManager
+
     }
 
     fun onLoginButtonClicked(view: View) {
@@ -138,6 +148,8 @@ class MainActivity : AppCompatActivity() {
             mainChannelName.setText(R.string.please_login)
             MessageService.clearMessages()
             MessageService.clearChannels()
+            channelAdapter.notifyDataSetChanged()
+            messageAdapter.notifyDataSetChanged()
         } else {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
@@ -176,8 +188,9 @@ class MainActivity : AppCompatActivity() {
             mainChannelName.text = it.toString()
             MessageService.getMessages(it.id) { complete ->
                 if (complete) {
-                    MessageService.messages.forEach { m ->
-                        println(m)
+                    messageAdapter.notifyDataSetChanged()
+                    if (messageAdapter.itemCount > 0) {
+                        messageListView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                     }
                 }
             }
