@@ -1,6 +1,7 @@
 package com.kissybnts.udemykotlinandroid5.service
 
 import android.graphics.Color
+import com.kissybnts.udemykotlinandroid5.controller.App
 import java.util.*
 
 object UserDataService {
@@ -33,9 +34,9 @@ object UserDataService {
         email = ""
         avatarName = ""
         avatarColor = ""
-        AuthService.token = ""
-        AuthService.isAuthed = false
-        AuthService.userEmail = ""
+        App.prefs.authToken = ""
+        App.prefs.isLoggedIn = false
+        App.prefs.userEmail = ""
     }
 
     override fun toString(): String {

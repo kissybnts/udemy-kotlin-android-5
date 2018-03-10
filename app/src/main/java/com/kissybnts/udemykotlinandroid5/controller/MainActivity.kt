@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private val userDataChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
-            if (AuthService.isAuthed) {
+            if (App.prefs.isLoggedIn) {
                 userNameNavHeader.text = UserDataService.name
                 userEmailNavHeader.text = UserDataService.email
                 val resourceId = resources.getIdentifier(UserDataService.avatarName, "drawable", packageName)
@@ -69,6 +69,10 @@ class MainActivity : AppCompatActivity() {
 
         socket.connect()
         socket.on(EMIT_CHANNEL_CREATED, onNewChannel)
+
+        if (App.prefs.isLoggedIn) {
+            AuthService.findByUserByEmail(this) {}
+        }
     }
 
     override fun onResume() {
@@ -96,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onLoginButtonClicked(view: View) {
-        if (AuthService.isAuthed) {
+        if (App.prefs.isLoggedIn) {
             UserDataService.logout()
             loginButtonNavHeader.setText(R.string.login)
             userNameNavHeader.text = ""
@@ -110,7 +114,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onAddChannelButtonClicked(view: View) {
-        if (AuthService.isAuthed) {
+        if (App.prefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
             builder.setView(dialogView).setPositiveButton("Add") { dialogInterface, i ->

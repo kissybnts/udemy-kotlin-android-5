@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
+import com.kissybnts.udemykotlinandroid5.controller.App
 import com.kissybnts.udemykotlinandroid5.model.Channel
 import com.kissybnts.udemykotlinandroid5.utils.CONTENT_TYPE
 import com.kissybnts.udemykotlinandroid5.utils.URL_GET_CHANNELS
@@ -34,10 +34,10 @@ object MessageService {
             }
 
             override fun getHeaders(): MutableMap<String, String> {
-                return hashMapOf("Authorization" to "Bearer ${AuthService.token}")
+                return hashMapOf("Authorization" to "Bearer ${App.prefs.authToken}")
             }
         }
 
-        Volley.newRequestQueue(context).add(channelRequest)
+        App.prefs.requestQue.add(channelRequest)
     }
 }

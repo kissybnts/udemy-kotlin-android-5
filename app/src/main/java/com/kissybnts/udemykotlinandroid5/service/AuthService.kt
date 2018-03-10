@@ -8,16 +8,12 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.kissybnts.udemykotlinandroid5.controller.App
 import com.kissybnts.udemykotlinandroid5.utils.*
 import org.json.JSONException
 import org.json.JSONObject
 
 object AuthService {
-    var token = ""
-    var isAuthed = false
-    var userEmail = ""
-
     fun registerUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
         val url: String = URL_REGISTER
 
@@ -41,7 +37,7 @@ object AuthService {
             }
         }
 
-        Volley.newRequestQueue(context).add(registerRequest)
+        App.prefs.requestQue.add(registerRequest)
     }
 
     fun login(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
@@ -54,9 +50,9 @@ object AuthService {
 
         val loginRequest = object : JsonObjectRequest(Request.Method.POST, url, null, Response.Listener { response ->
             try {
-                userEmail = response.getString("user")
-                token = response.getString("token")
-                isAuthed = true
+                App.prefs.userEmail = response.getString("user")
+                App.prefs.authToken = response.getString("token")
+                App.prefs.isLoggedIn = true
                 complete(true)
             } catch (e: JSONException) {
                 Log.d("JSON", "EXC: ${e.localizedMessage}")
@@ -75,7 +71,7 @@ object AuthService {
             }
         }
 
-        Volley.newRequestQueue(context).add(loginRequest)
+        App.prefs.requestQue.add(loginRequest)
     }
     
     fun createUser(context: Context, name: String, email: String, avatarName: String, avatarColor: String, complete: (Boolean) -> Unit) {
@@ -115,16 +111,16 @@ object AuthService {
             }
 
             override fun getHeaders(): MutableMap<String, String> {
-                return hashMapOf("Authorization" to "Bearer ${token}")
+                return hashMapOf("Authorization" to "Bearer ${App.prefs.authToken}")
             }
         }
         
-        Volley.newRequestQueue(context).add(createUserRequest)
+        App.prefs.requestQue.add(createUserRequest)
     }
 
 
     fun findByUserByEmail(context: Context, complete: (Boolean) -> Unit) {
-        val url = URL_FIND_USER_BY_EMIL(userEmail)
+        val url = URL_FIND_USER_BY_EMIL(App.prefs.userEmail)
         val findUserRequest = object : JsonObjectRequest(Request.Method.GET, url, null, Response.Listener {
             try {
                 it.run {
@@ -149,7 +145,7 @@ object AuthService {
             complete(false)
         }) {
             override fun getHeaders(): MutableMap<String, String> {
-                return hashMapOf("Authorization" to "Bearer ${token}")
+                return hashMapOf("Authorization" to "Bearer ${App.prefs.authToken}")
             }
 
             override fun getBodyContentType(): String {
@@ -157,6 +153,6 @@ object AuthService {
             }
         }
 
-         Volley.newRequestQueue(context).add(findUserRequest)
+        App.prefs.requestQue.add(findUserRequest)
     }
 }
