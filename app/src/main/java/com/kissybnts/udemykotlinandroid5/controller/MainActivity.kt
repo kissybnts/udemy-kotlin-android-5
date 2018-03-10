@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.model.Channel
+import com.kissybnts.udemykotlinandroid5.model.Message
 import com.kissybnts.udemykotlinandroid5.service.AuthService
 import com.kissybnts.udemykotlinandroid5.service.MessageService
 import com.kissybnts.udemykotlinandroid5.service.UserDataService
@@ -34,6 +35,13 @@ class MainActivity : AppCompatActivity() {
             val channel = Channel(args)
             MessageService.channels.add(channel)
             channelAdapter.notifyDataSetChanged()
+        }
+    }
+    private val onNewMessage = Emitter.Listener { args ->
+        runOnUiThread {
+            val message = Message(args)
+            MessageService.messages.add(message)
+            println(message)
         }
     }
     private lateinit var channelAdapter: ArrayAdapter<Channel>
@@ -73,6 +81,7 @@ class MainActivity : AppCompatActivity() {
 
         socket.connect()
         socket.on(EMIT_CHANNEL_CREATED, onNewChannel)
+        socket.on(EMIT_MESSAGE_CREATED, onNewMessage)
 
         if (App.prefs.isLoggedIn) {
             AuthService.findByUserByEmail(this) {}
@@ -140,7 +149,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSendMessageButtonClicked(view: View) {
-        hideKeyboard()
+        val channel = selectedChannel
+        if (App.prefs.isLoggedIn && messageTextField.text.isNotEmpty() && channel != null) {
+            val userId = UserDataService.id
+            val channelId = channel.id
+            socket.emit("newMessage", messageTextField.text.toString(), userId, channelId, UserDataService.name, UserDataService.avatarName, UserDataService.avatarColor)
+            messageTextField.text.clear()
+            hideKeyboard()
+        }
     }
 
     fun updateWithChannel() {

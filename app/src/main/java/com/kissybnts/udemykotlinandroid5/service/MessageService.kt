@@ -6,12 +6,14 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.kissybnts.udemykotlinandroid5.controller.App
 import com.kissybnts.udemykotlinandroid5.model.Channel
+import com.kissybnts.udemykotlinandroid5.model.Message
 import com.kissybnts.udemykotlinandroid5.utils.CONTENT_TYPE
 import com.kissybnts.udemykotlinandroid5.utils.URL_GET_CHANNELS
 import org.json.JSONException
 
 object MessageService {
     val channels = ArrayList<Channel>()
+    val messages = ArrayList<Message>()
 
     fun getChannels(complete: (Boolean) -> Unit) {
         val channelRequest = object : JsonArrayRequest(Method.GET, URL_GET_CHANNELS, null, Response.Listener {
