@@ -31,17 +31,24 @@ import kotlinx.android.synthetic.main.nav_header_main.*
 class MainActivity : AppCompatActivity() {
     private val socket = IO.socket(URL_SOCKET)
     private val onNewChannel = Emitter.Listener { args ->
-        runOnUiThread {
-            val channel = Channel(args)
-            MessageService.channels.add(channel)
-            channelAdapter.notifyDataSetChanged()
+        if (App.prefs.isLoggedIn) {
+            runOnUiThread {
+                val channel = Channel(args)
+                MessageService.channels.add(channel)
+                channelAdapter.notifyDataSetChanged()
+            }
         }
     }
     private val onNewMessage = Emitter.Listener { args ->
-        runOnUiThread {
-            val message = Message(args)
-            MessageService.messages.add(message)
-            println(message)
+        if (App.prefs.isLoggedIn) {
+            runOnUiThread {
+                // args[2] means a channel id
+                if (selectedChannel?.id == args[2] as String) {
+                    val message = Message(args)
+                    MessageService.messages.add(message)
+                    println(message)
+                }
+            }
         }
     }
     private lateinit var channelAdapter: ArrayAdapter<Channel>
@@ -59,9 +66,11 @@ class MainActivity : AppCompatActivity() {
 
                 MessageService.getChannels { complete ->
                     if (complete) {
-                        selectedChannel = MessageService.channels.firstOrNull()
-                        channelAdapter.notifyDataSetChanged()
-                        updateWithChannel()
+                        MessageService.channels.firstOrNull()?.let {
+                            selectedChannel = it
+                            channelAdapter.notifyDataSetChanged()
+                            updateWithChannel()
+                        }
                     }
                 }
             }
@@ -126,6 +135,9 @@ class MainActivity : AppCompatActivity() {
             userEmailNavHeader.text = ""
             userImageNavHeader.setImageResource(R.drawable.profiledefault)
             userImageNavHeader.setBackgroundColor(Color.TRANSPARENT)
+            mainChannelName.setText(R.string.please_login)
+            MessageService.clearMessages()
+            MessageService.clearChannels()
         } else {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
@@ -153,13 +165,22 @@ class MainActivity : AppCompatActivity() {
         if (App.prefs.isLoggedIn && messageTextField.text.isNotEmpty() && channel != null) {
             val userId = UserDataService.id
             val channelId = channel.id
-            socket.emit("newMessage", messageTextField.text.toString(), userId, channelId, UserDataService.name, UserDataService.avatarName, UserDataService.avatarColor)
+            socket.emit(EMIT_ADD_MESSAGE, messageTextField.text.toString(), userId, channelId, UserDataService.name, UserDataService.avatarName, UserDataService.avatarColor)
             messageTextField.text.clear()
             hideKeyboard()
         }
     }
 
     fun updateWithChannel() {
-        mainChannelName.text = selectedChannel?.toString()
+        selectedChannel?.let {
+            mainChannelName.text = it.toString()
+            MessageService.getMessages(it.id) { complete ->
+                if (complete) {
+                    MessageService.messages.forEach { m ->
+                        println(m)
+                    }
+                }
+            }
+        }
     }
 }

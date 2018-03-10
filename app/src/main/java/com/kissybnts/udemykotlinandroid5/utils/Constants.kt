@@ -7,6 +7,7 @@ const val URL_LOGIN = "$BASE_URL/account/login"
 const val URL_CREATE_USER = "$BASE_URL/user/add"
 fun URL_FIND_USER_BY_EMIL(email: String): String =  "$BASE_URL/user/byEmail/$email"
 const val URL_GET_CHANNELS = "$BASE_URL/channel"
+fun URL_GET_MESSAGES(channelId: String) = "$BASE_URL/message/byChannel/$channelId"
 const val URL_SOCKET = "https://udemykotlinandroid.herokuapp.com"
 
 const val BROADCAST_USER_DATA_CHANGE = "broadcast/userDataChange"
