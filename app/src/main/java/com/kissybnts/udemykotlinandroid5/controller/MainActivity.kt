@@ -96,6 +96,8 @@ class MainActivity : AppCompatActivity() {
         socket.on(EMIT_CHANNEL_CREATED, onNewChannel)
         socket.on(EMIT_MESSAGE_CREATED, onNewMessage)
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(BROADCAST_USER_DATA_CHANGE))
+
         if (App.prefs.isLoggedIn) {
             AuthService.findByUserByEmail(this) {}
         }
@@ -105,11 +107,6 @@ class MainActivity : AppCompatActivity() {
             drawer_layout.closeDrawer(GravityCompat.START)
             updateWithChannel()
         }
-    }
-
-    override fun onResume() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(BROADCAST_USER_DATA_CHANGE))
-        super.onResume()
     }
 
     override fun onDestroy() {

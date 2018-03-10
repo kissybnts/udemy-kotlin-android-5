@@ -2,6 +2,7 @@ package com.kissybnts.udemykotlinandroid5.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,9 @@ import android.widget.TextView
 import com.kissybnts.udemykotlinandroid5.R
 import com.kissybnts.udemykotlinandroid5.model.Message
 import com.kissybnts.udemykotlinandroid5.service.UserDataService
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MessageAdapter(private val context: Context, private val messages: ArrayList<Message>) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
@@ -36,8 +40,22 @@ class MessageAdapter(private val context: Context, private val messages: ArrayLi
             userImage?.setImageResource(resourceId)
             userImage?.setBackgroundColor(UserDataService.getAvatarColor(message.userAvatarColor))
             userName?.text = message.userName
-            timestamp?.text = message.timestamp
+            timestamp?.text = formatDateString(message.timestamp)
             messageBody?.text = message.message
+        }
+
+        private fun formatDateString(isoString: String): String {
+            val isoFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            isoFormatter.timeZone = TimeZone.getTimeZone("UTC")
+            var convertedDate = Date()
+            try {
+                convertedDate = isoFormatter.parse(isoString)
+            } catch (e: ParseException) {
+                Log.d("PARSE", "Could not parse date")
+            }
+
+            val dateFormatter = SimpleDateFormat("EEE h:mm a", Locale.getDefault())
+            return dateFormatter.format(convertedDate)
         }
     }
 }
